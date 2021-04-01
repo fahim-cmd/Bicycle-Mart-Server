@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.omrot.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
-console.log(uri)
+
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const bicycleCollection = client.db("bicycle").collection("products");
@@ -31,6 +31,34 @@ client.connect(err => {
       })
   })
 
+  //for specific item 
+  app.get('/singleItem', (req, res) => {
+    // console.log(req.query.email)
+    bicycleCollection.find()
+    .toArray((err, items) => {
+      res.send(items)
+    })
+  })
+
+
+  //add orders
+  app.post('/addOrders', (req, res) => {
+    const newOrders = req.body;
+    bicycleCollection.insertOne(newOrders)
+    .then(result => {
+      res.send(result.insertedCount > 0)
+    })
+    console.log(newOrders);
+  })
+
+  //add order read in client side
+  app.get('/orderRead', (req, res) => {
+    bicycleCollection.find({email: req.query.email})
+    .toArray((err, documents) => {
+      res.send(documents)
+    })
+  })
+
 
   app.post('/addProduct', (req, res) => {
       const newProduct = req.body;
@@ -42,11 +70,9 @@ client.connect(err => {
           res.send(result.insertedCount > 0)
       })
   })
-
-//   client.close();
 });
 
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  // console.log(`Example app listening at http://localhost:${port}`)
 })
