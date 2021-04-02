@@ -21,7 +21,7 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const bicycleCollection = client.db("bicycle").collection("products");
-  
+  const newBicycleCollection = client.db("bicycle").collection("newBicycle");
 
   app.get('/products', (req, res) => {
       bicycleCollection.find()
@@ -32,19 +32,19 @@ client.connect(err => {
   })
 
   //for specific item 
-  app.get('/singleItem', (req, res) => {
-    // console.log(req.query.email)
-    bicycleCollection.find()
-    .toArray((err, items) => {
-      res.send(items)
-    })
-  })
+  // app.get('/singleItem', (req, res) => {
+    
+  //   bicycleCollection.find({})
+  //   .toArray((err, items) => {
+  //     res.send(items)
+  //   })
+  // })
 
 
   //add orders
   app.post('/addOrders', (req, res) => {
     const newOrders = req.body;
-    bicycleCollection.insertOne(newOrders)
+    newBicycleCollection.insertOne(newOrders)
     .then(result => {
       res.send(result.insertedCount > 0)
     })
@@ -53,7 +53,7 @@ client.connect(err => {
 
   //add order read in client side
   app.get('/orderRead', (req, res) => {
-    bicycleCollection.find({email: req.query.email})
+    newBicycleCollection.find({email: req.query.email})
     .toArray((err, documents) => {
       res.send(documents)
     })
