@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 require('dotenv').config()
 const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectID;
 const app = express()
 
 
@@ -31,14 +32,14 @@ client.connect(err => {
       })
   })
 
-  //for specific item 
-  // app.get('/singleItem', (req, res) => {
+  //for delete item
+  app.get('/', (req, res) => {
     
-  //   bicycleCollection.find({})
-  //   .toArray((err, items) => {
-  //     res.send(items)
-  //   })
-  // })
+    bicycleCollection.find({})
+    .toArray((err, items) => {
+      res.send(items)
+    })
+  })
 
 
   //add orders
@@ -69,10 +70,25 @@ client.connect(err => {
           console.log('server response', result)
           res.send(result.insertedCount > 0)
       })
+  }) 
+
+  
+//delete method
+
+  app.delete('/delete/:id', (req, res) => {
+    // console.log(req.params.id)
+    bicycleCollection.deleteOne({_id: ObjectId(req.params.id)})
+    .then(result => {
+      
+      res.send(result.deletedCount > 0)
+    })
+
   })
+
 });
 
 
-app.listen(port, () => {
-  // console.log(`Example app listening at http://localhost:${port}`)
-})
+
+
+
+app.listen(process.env.PORT || port)
